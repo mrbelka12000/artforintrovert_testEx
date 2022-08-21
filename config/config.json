@@ -1,0 +1,10 @@
+{
+    "api":{
+        "port":"8080"
+    },
+    "mongoDB":{
+        "database":"store",
+        "collection":"storecollection"
+    }
+    
+}
