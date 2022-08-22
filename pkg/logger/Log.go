@@ -15,6 +15,5 @@ func NewLogger() (*zap.SugaredLogger, error) {
 	}
 
 	zap.ReplaceGlobals(logger)
-logger.Sugar().Sync()
 	return logger.Sugar(), nil
 }

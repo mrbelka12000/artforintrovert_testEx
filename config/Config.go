@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"sync"
 
 	"go.uber.org/zap"
@@ -36,9 +37,13 @@ func GetConf() *config {
 }
 
 func parseConf() *config {
+	path := os.Getenv("cfgPath")
+	if path == "" {
+		path = cfgPath
+	}
 	cfg = &config{}
 
-	err := gonfig.GetConf(cfgPath, cfg)
+	err := gonfig.GetConf(path, cfg)
 	if err != nil {
 		zap.S().Debugf("parse config error: %v ", err.Error())
 		return nil

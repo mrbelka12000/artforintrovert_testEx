@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,7 +14,7 @@ const waitLimit = 8 * time.Second
 
 func GetMongoDBClient() (*mongo.Client, error) {
 	ctx, _ := context.WithTimeout(context.Background(), waitLimit)
-	uri := "mongodb+srv://doadmin:7IJ9Cs51ZnP2630f@db-mongodb-nyc1-89399-22308279.mongo.ondigitalocean.com/admin?tls=true&authSource=admin&replicaSet=db-mongodb-nyc1-89399"
+	uri := os.Getenv("MONGODB_URI")
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
 		return nil, fmt.Errorf("can not connect to MongoDB: %w", err)

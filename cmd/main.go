@@ -60,7 +60,7 @@ func main() {
 	zap.S().Info("Server stopped")
 
 	defer func() {
-		err := client.Disconnect(ctx)
+		err = client.Disconnect(ctx)
 		if err != nil {
 			zap.S().Warnf("failed to close client: %v", err)
 		} else {
