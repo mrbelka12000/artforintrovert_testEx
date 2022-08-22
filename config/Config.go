@@ -18,6 +18,8 @@ type config struct {
 	MongoDB struct {
 		Database   string
 		Collection string
+		Host       string
+		Port       string
 	}
 }
 

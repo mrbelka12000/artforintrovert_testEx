@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -14,8 +15,13 @@ const timeout = 15 * time.Second
 func NewServer(r *mux.Router) *http.Server {
 	cfg := config.GetConf()
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = cfg.Api.Port
+	}
+
 	return &http.Server{
-		Addr:         ":" + cfg.Api.Port,
+		Addr:         ":" + port,
 		Handler:      r,
 		ReadTimeout:  timeout,
 		IdleTimeout:  timeout,

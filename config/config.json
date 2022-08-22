@@ -2,9 +2,11 @@
     "api":{
         "port":"8080"
     },
-    "mongoDB":{
+    "mongoDB": {
         "database":"store",
-        "collection":"storecollection"
+        "collection":"storecollection",
+        "host": "mongodb",
+        "port": "27017"
     }
     
 }
