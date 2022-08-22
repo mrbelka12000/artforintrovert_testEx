@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -22,7 +21,10 @@ import (
 )
 
 func main() {
+
+	mainCtx, mainCancel := context.WithCancel(context.Background())
 	done := make(chan os.Signal, 1)
+	wait := make(chan struct{})
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	_, err := logger.NewLogger()
@@ -30,23 +32,21 @@ func main() {
 		log.Fatalf("failed to prepare logger: %v", err)
 	}
 
-	cfg := config.GetConf()
-	fmt.Printf("%+v \n", cfg)
-
 	client, err := repository.GetMongoDBClient()
 	if err != nil {
 		zap.S().Debugf("failed to get connection: %v", err)
 		return
 	}
 
-	fmt.Printf("%+v \n", repository.GetData(client))
-
+	cfg := config.GetConf()
 	repo := repository.NewRepository(client)
 	srv := service.NewService(repo)
 	handler := handler.NewHandler(srv)
 	mux := router.SetUpMux(handler)
 	server := server.NewServer(mux)
+	srv.Insert()
 
+	go repository.Updater(client, mainCtx, wait)
 	go func() {
 		err := server.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -55,10 +55,15 @@ func main() {
 		}
 	}()
 
-	zap.S().Info("Server started on port :" + cfg.Api.Port)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = cfg.Api.Port
+	}
+
+	zap.S().Info("Server started on port :" + port)
 	<-done
 
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, _ := context.WithTimeout(mainCtx, 5*time.Second)
 	zap.S().Info("Server stopped")
 
 	defer func() {
@@ -69,6 +74,8 @@ func main() {
 			zap.S().Info("client successfully closed")
 		}
 		zap.S().Sync()
+		close(done)
+		close(wait)
 	}()
 
 	err = server.Shutdown(ctx)
@@ -76,4 +83,8 @@ func main() {
 		zap.S().Errorf("failed to shutdown server: %v", err)
 		return
 	}
+
+	mainCancel()
+
+	<-wait
 }

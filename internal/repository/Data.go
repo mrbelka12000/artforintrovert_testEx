@@ -6,13 +6,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
+	"time"
 
 	"github.com/mrbelka12000/artforintrovert_testEx/models"
 )
 
 var (
-	data    []models.Product
-	updated = true
+	data         []models.Product
+	needToUpdate = true
 )
 
 func updateData(client *mongo.Client) {
@@ -47,21 +48,40 @@ func updateData(client *mongo.Client) {
 
 	data = products
 
-	updated = false
+	needToUpdate = false
 }
 
 func GetData(client *mongo.Client) []models.Product {
-	if !updated {
+	if !needToUpdate {
 		return data
 	}
 
 	updateData(client)
 
-	if updated {
-		zap.S().Debug("data can not be updated")
+	if needToUpdate {
+		zap.S().Debug("data can not be needToUpdate")
 		return nil
 	}
 
-	zap.S().Info("data updated")
+	zap.S().Info("data needToUpdate")
 	return data
+}
+
+func Updater(client *mongo.Client, ctx context.Context, ch chan struct{}) {
+	ticker := time.NewTicker(5 * time.Second)
+
+	for {
+
+		select {
+		case <-ticker.C:
+			if needToUpdate {
+				updateData(client)
+			}
+		case <-ctx.Done():
+			zap.S().Info("updater func successfully ended")
+			ch <- struct{}{}
+			return
+		}
+	}
+
 }

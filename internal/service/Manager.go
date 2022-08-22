@@ -26,5 +26,5 @@ func (m *manager) Delete(id int) error {
 }
 
 func (m *manager) Insert() error {
-	return nil
+	return m.repo.Insert()
 }
