@@ -46,6 +46,7 @@ func updateData(client *mongo.Client) {
 		return
 	}
 
+	zap.S().Info("data successfully updated")
 	data = products
 
 	needToUpdate = false
@@ -59,19 +60,19 @@ func GetData(client *mongo.Client) []models.Product {
 	updateData(client)
 
 	if needToUpdate {
-		zap.S().Debug("data can not be needToUpdate")
+		zap.S().Warn("data can not be updated")
 		return nil
 	}
 
-	zap.S().Info("data needToUpdate")
 	return data
 }
 
 func Updater(client *mongo.Client, ctx context.Context, ch chan struct{}) {
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(1 * time.Minute)
+
+	updateData(client)
 
 	for {
-
 		select {
 		case <-ticker.C:
 			if needToUpdate {
@@ -83,5 +84,4 @@ func Updater(client *mongo.Client, ctx context.Context, ch chan struct{}) {
 			return
 		}
 	}
-
 }

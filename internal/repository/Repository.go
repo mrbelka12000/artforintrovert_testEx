@@ -6,9 +6,9 @@ import (
 )
 
 type Store interface {
-	Change(product *models.Product) (*models.Product, error)
+	Update(product *models.Product) error
 	GetAll() ([]models.Product, error)
-	Delete(id int) error
+	Delete(id string) error
 	Insert() error
 }
 

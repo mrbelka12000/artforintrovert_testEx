@@ -44,7 +44,7 @@ func main() {
 	handler := handler.NewHandler(srv)
 	mux := router.SetUpMux(handler)
 	server := server.NewServer(mux)
-	srv.Insert()
+	//srv.Insert()
 
 	go repository.Updater(client, mainCtx, wait)
 	go func() {

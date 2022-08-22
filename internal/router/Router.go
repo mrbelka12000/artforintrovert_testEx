@@ -10,8 +10,8 @@ import (
 
 func SetUpMux(h *handler.Handler) *mux.Router {
 	r := mux.NewRouter()
-	r.HandleFunc("/", h.GetAllProducts).Methods(http.MethodGet)
-	r.HandleFunc("/remove/{id}", h.RemoveProduct).Methods(http.MethodDelete)
-	r.HandleFunc("/update", h.UpdateProduct).Methods(http.MethodPost)
+	r.HandleFunc("/product", h.GetAllProducts).Methods(http.MethodGet)
+	r.HandleFunc("/product/delete/{id}", h.RemoveProduct).Methods(http.MethodDelete)
+	r.HandleFunc("/product/update", h.UpdateProduct).Methods(http.MethodPut)
 	return r
 }
