@@ -39,6 +39,8 @@ func main() {
 		return
 	}
 
+	fmt.Printf("%+v", repository.GetData(client))
+
 	repo := repository.NewRepository(client)
 	srv := service.NewService(repo)
 	handler := handler.NewHandler(srv)

@@ -9,7 +9,7 @@ services:
     volumes:
       - mongodb-data:/data/db
     ports:
-      - 27017:27017
+      - "27017:27017"
     restart: unless-stopped
     networks:
       - art
@@ -31,7 +31,6 @@ volumes:
   api:
   mongodb-data:
 
-# Networks to be created to facilitate communication between containers
 networks:
   art:
     driver: bridge

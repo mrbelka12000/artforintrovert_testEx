@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"context"
+	"github.com/mrbelka12000/artforintrovert_testEx/config"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
 
@@ -9,11 +12,40 @@ import (
 
 var (
 	data    []models.Product
-	updated bool = true
+	updated = true
 )
 
 func updateData(client *mongo.Client) {
-	// data = GetAll
+	cfg := config.GetConf()
+
+	coll := client.Database(cfg.MongoDB.Database).Collection(cfg.MongoDB.Collection)
+
+	var products []models.Product
+
+	cursor, err := coll.Find(context.Background(), bson.D{})
+	if err != nil {
+		zap.S().Errorf("unable to find data: %v", err)
+		return
+	}
+
+	for cursor.Next(context.Background()) {
+		var product models.Product
+		err := cursor.Decode(&product)
+		if err != nil {
+			zap.S().Debugf("decode error: %v", err)
+			continue
+		}
+
+		products = append(products, product)
+	}
+
+	err = cursor.Err()
+	if err != nil {
+		zap.S().Debugf("cursor error: %v", err)
+		return
+	}
+
+	data = products
 
 	updated = false
 }
