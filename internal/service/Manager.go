@@ -14,7 +14,7 @@ func newManager(repo *repository.Repository) *manager {
 }
 
 func (m *manager) GetAll() ([]models.Product, error) {
-	return nil, nil
+	return m.repo.GetAll()
 }
 
 func (m *manager) Change(product *models.Product) (*models.Product, error) {

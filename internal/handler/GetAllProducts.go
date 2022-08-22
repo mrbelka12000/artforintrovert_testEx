@@ -1,7 +1,18 @@
 package handler
 
-import "net/http"
+import (
+	"github.com/mrbelka12000/artforintrovert_testEx/pkg/tools"
+	"net/http"
+)
 
 func (h *Handler) GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
+	data, err := h.srv.GetAll()
+	if err != nil {
+		ErrorResponse(w, http.StatusInternalServerError, "no data")
+		return
+	}
+
+	w.Write([]byte(tools.GetJsonString(data)))
 }
