@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/app"
@@ -14,5 +15,6 @@ func main() {
 	}
 	defer logger.Sync()
 
-	app.Run()
+	ctx := context.Background()
+	app.Run(ctx)
 }

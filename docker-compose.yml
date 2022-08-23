@@ -14,6 +14,7 @@ services:
     networks:
       - art
   api:
+    container_name: api
     build: .
     environment:
       - cfgPath=config/config.json

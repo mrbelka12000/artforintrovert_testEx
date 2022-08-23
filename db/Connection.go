@@ -13,12 +13,12 @@ import (
 
 const waitLimitForConnection = 8 * time.Second
 
-func GetMongoDBClient() (*mongo.Client, error) {
+func GetMongoDBClient(ctx context.Context) (*mongo.Client, error) {
 	cfg := config.GetConf()
 
-	ctx, _ := context.WithTimeout(context.Background(), waitLimitForConnection)
+	connCtx, _ := context.WithTimeout(ctx, waitLimitForConnection)
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.MongoDB.MongoUrl))
+	client, err := mongo.Connect(connCtx, options.Client().ApplyURI(cfg.MongoDB.MongoUrl))
 	if err != nil {
 		return nil, fmt.Errorf("can not connect to MongoDB: %w", err)
 	}

@@ -20,20 +20,22 @@ import (
 	"github.com/mrbelka12000/artforintrovert_testEx/pkg/service"
 )
 
-func Run() {
+const waitLimitForGS = 5 * time.Second
+
+func Run(ctx context.Context) {
 	cfg := config.GetConf()
 	if cfg == nil {
 		zap.S().Debug("failed to prepare config")
 		return
 	}
 
-	client, err := db.GetMongoDBClient()
+	client, err := db.GetMongoDBClient(ctx)
 	if err != nil {
 		zap.S().Debugf("failed to get connection: %v", err)
 		return
 	}
 
-	runCtx, runCancel := context.WithCancel(context.Background())
+	runCtx, runCancel := context.WithCancel(ctx)
 	done := make(chan os.Signal, 1)
 	wait := make(chan struct{})
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -54,10 +56,10 @@ func Run() {
 		}
 	}()
 
-	zap.S().Info("Server started on port :" + cfg.Api.Port)
+	zap.S().Infof("Server started on port: %v", cfg.Api.Port)
 	<-done
 
-	stopCtx, _ := context.WithTimeout(runCtx, 5*time.Second)
+	stopCtx, _ := context.WithTimeout(ctx, waitLimitForGS)
 	zap.S().Info("Server stopped")
 
 	defer func() {
@@ -70,12 +72,13 @@ func Run() {
 		close(done)
 		close(wait)
 	}()
+	runCancel()
 
 	err = server.Shutdown(stopCtx)
 	if err != nil {
 		zap.S().Errorf("failed to shutdown server: %v", err)
+		return
 	}
 
-	runCancel()
 	<-wait
 }
