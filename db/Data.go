@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,43 +13,55 @@ import (
 	"github.com/mrbelka12000/artforintrovert_testEx/models"
 )
 
-var (
+type Data struct {
 	data         []models.Product
-	needToUpdate = true
-)
+	needToUpdate bool
+	sync.Mutex
+}
+
+var globData = &Data{
+	needToUpdate: true,
+}
 
 const waitLimitForTicker = 1 * time.Minute
 
 func GetData(client *mongo.Client) []models.Product {
-	if !needToUpdate {
-		return data
+	globData.Lock()
+	defer globData.Unlock()
+	if !globData.needToUpdate {
+		return globData.data
 	}
-
 	updateData(client)
 
-	if needToUpdate {
+	if globData.needToUpdate {
 		zap.S().Warn("data can not be updated")
 		return nil
 	}
 
-	return data
+	return globData.data
 }
 
 func NeetToUpdate() {
-	needToUpdate = true
+	globData.Lock()
+	globData.needToUpdate = true
+	globData.Unlock()
 }
 
 func Updater(client *mongo.Client, ctx context.Context, ch chan struct{}) {
 	ticker := time.NewTicker(waitLimitForTicker)
 
+	globData.Lock()
 	updateData(client)
+	globData.Unlock()
 
 	for {
 		select {
 		case <-ticker.C:
-			if needToUpdate {
+			globData.Lock()
+			if globData.needToUpdate {
 				updateData(client)
 			}
+			globData.Unlock()
 		case <-ctx.Done():
 			zap.S().Info("updater func successfully ended")
 			ch <- struct{}{}
@@ -89,7 +102,7 @@ func updateData(client *mongo.Client) {
 	}
 
 	zap.S().Info("data successfully updated")
-	data = products
 
-	needToUpdate = false
+	globData.data = products
+	globData.needToUpdate = false
 }
