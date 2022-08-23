@@ -1,8 +1,9 @@
 package repository
 
 import (
-	"github.com/mrbelka12000/artforintrovert_testEx/models"
 	"go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/mrbelka12000/artforintrovert_testEx/models"
 )
 
 type Store interface {

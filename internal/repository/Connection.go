@@ -3,11 +3,12 @@ package repository
 import (
 	"context"
 	"fmt"
-	"github.com/mrbelka12000/artforintrovert_testEx/pkg/tools"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/mrbelka12000/artforintrovert_testEx/pkg/tools"
 )
 
 const waitLimit = 8 * time.Second

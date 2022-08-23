@@ -1,9 +1,10 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 func (h *Handler) RemoveProduct(w http.ResponseWriter, r *http.Request) {

@@ -2,11 +2,14 @@ package service
 
 import (
 	"errors"
+
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/repository"
 )
 
-var ErrClientError = errors.New("client error")
-var ErrServerError = errors.New("server error")
+var (
+	ErrClientError = errors.New("client error")
+	ErrServerError = errors.New("server error")
+)
 
 func IsClientError(err error) bool {
 	return errors.Is(err, repository.ErrInvalidId) ||

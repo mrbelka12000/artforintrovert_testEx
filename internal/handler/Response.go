@@ -2,10 +2,12 @@ package handler
 
 import (
 	"errors"
+	"net/http"
+
+	"go.uber.org/zap"
+
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/service"
 	"github.com/mrbelka12000/artforintrovert_testEx/pkg/tools"
-	"go.uber.org/zap"
-	"net/http"
 )
 
 type Resp struct {

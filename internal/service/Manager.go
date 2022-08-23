@@ -3,9 +3,11 @@ package service
 import (
 	"errors"
 	"fmt"
+
+	"go.uber.org/zap"
+
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/repository"
 	"github.com/mrbelka12000/artforintrovert_testEx/models"
-	"go.uber.org/zap"
 )
 
 type manager struct {
@@ -44,10 +46,9 @@ func (m *manager) Delete(id string) error {
 			return fmt.Errorf("%v: %w", err.Error(), ErrServerError)
 		} else {
 			zap.S().Debugf("unknown error received: %v", err)
-			return err
+			return fmt.Errorf("%v: %w", err.Error(), errors.Unwrap(err))
 		}
 	}
-
 	return nil
 }
 

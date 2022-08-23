@@ -4,14 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/mrbelka12000/artforintrovert_testEx/config"
-	"github.com/mrbelka12000/artforintrovert_testEx/models"
+	"log"
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
-	"log"
-	"time"
+
+	"github.com/mrbelka12000/artforintrovert_testEx/config"
+	"github.com/mrbelka12000/artforintrovert_testEx/models"
 )
 
 type manager struct {
@@ -64,7 +66,7 @@ func (m *manager) Delete(id string) error {
 
 	primitiveId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		zap.S().Warnf("invalid id received %v ", id)
+		zap.S().Errorf("invalid id received %v ", id)
 		return fmt.Errorf("%w", ErrInvalidId)
 	}
 
@@ -90,12 +92,12 @@ func (m *manager) Delete(id string) error {
 	return nil
 }
 
-//Insert inserts default values to database.
+// Insert inserts default values to database.
 func (m *manager) Insert() error {
 	cfg := config.GetConf()
 
 	coll := m.client.Database(cfg.MongoDB.Database).Collection(cfg.MongoDB.Collection)
-	var products = []models.Product{
+	products := []models.Product{
 		{
 			ID:    primitive.NewObjectID(),
 			Name:  "apple",

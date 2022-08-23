@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"github.com/mrbelka12000/artforintrovert_testEx/pkg/tools"
 	"net/http"
 
 	"go.uber.org/zap"
+
+	"github.com/mrbelka12000/artforintrovert_testEx/pkg/tools"
 )
 
 func (h *Handler) GetAllProducts(w http.ResponseWriter, r *http.Request) {

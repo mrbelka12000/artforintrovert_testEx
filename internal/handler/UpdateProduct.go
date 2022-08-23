@@ -2,13 +2,14 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/mrbelka12000/artforintrovert_testEx/models"
-	"go.uber.org/zap"
 	"net/http"
+
+	"go.uber.org/zap"
+
+	"github.com/mrbelka12000/artforintrovert_testEx/models"
 )
 
 func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
-
 	var product *models.Product
 
 	err := json.NewDecoder(r.Body).Decode(&product)
