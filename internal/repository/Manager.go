@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -40,7 +39,7 @@ func (m *manager) Update(product *models.Product) error {
 
 	coll := m.client.Database(cfg.MongoDB.Database).Collection(cfg.MongoDB.Collection)
 
-	ctx, _ := context.WithTimeout(context.Background(), 5)
+	ctx, _ := context.WithTimeout(context.Background(), waitLimit)
 
 	update := bson.D{{"$set", bson.D{{"name", product.Name}, {"price", product.Price}}}}
 	result, err := coll.UpdateOne(ctx, bson.M{"_id": product.ID}, update)
@@ -70,7 +69,7 @@ func (m *manager) Delete(id string) error {
 		return fmt.Errorf("%w", ErrInvalidId)
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), waitLimit)
 
 	coll := m.client.Database(cfg.MongoDB.Database).Collection(cfg.MongoDB.Collection)
 
