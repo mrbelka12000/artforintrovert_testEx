@@ -18,7 +18,6 @@ import (
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/router"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/server"
 	"github.com/mrbelka12000/artforintrovert_testEx/pkg/service"
-	"github.com/mrbelka12000/artforintrovert_testEx/pkg/tools"
 )
 
 func Run() {
@@ -44,7 +43,7 @@ func Run() {
 	handler := handler.NewHandler(srv)
 	mux := router.SetUpMux(handler)
 	server := server.NewServer(mux)
-	// srv.Insert()
+	srv.Insert()
 
 	go db.Updater(client, runCtx, wait)
 	go func() {
@@ -55,7 +54,7 @@ func Run() {
 		}
 	}()
 
-	zap.S().Info("Server started on port :" + tools.GetApiPort())
+	zap.S().Info("Server started on port :" + cfg.Api.Port)
 	<-done
 
 	stopCtx, _ := context.WithTimeout(runCtx, 5*time.Second)

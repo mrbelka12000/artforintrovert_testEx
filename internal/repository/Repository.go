@@ -12,6 +12,6 @@ type Repository struct {
 
 func NewRepository(client *mongo.Client) *Repository {
 	return &Repository{
-		Store: newManager(client),
+		Store: newProduct(client),
 	}
 }

@@ -10,15 +10,15 @@ import (
 	"github.com/mrbelka12000/artforintrovert_testEx/models"
 )
 
-type manager struct {
+type product struct {
 	repo *repository.Repository
 }
 
-func newManager(repo *repository.Repository) *manager {
-	return &manager{repo}
+func newProduct(repo *repository.Repository) *product {
+	return &product{repo}
 }
 
-func (m *manager) Delete(id string) error {
+func (m *product) Delete(id string) error {
 	err := m.repo.Delete(id)
 	if err != nil {
 		if IsClientError(err) {
@@ -33,15 +33,15 @@ func (m *manager) Delete(id string) error {
 	return nil
 }
 
-func (m *manager) GetAll() ([]models.Product, error) {
+func (m *product) GetAll() ([]models.Product, error) {
 	return m.repo.GetAll()
 }
 
-func (m *manager) Insert() error {
+func (m *product) Insert() error {
 	return m.repo.Insert()
 }
 
-func (m *manager) Update(product *models.Product) error {
+func (m *product) Update(product *models.Product) error {
 	err := m.repo.Update(product)
 	if err != nil {
 		if IsClientError(err) {

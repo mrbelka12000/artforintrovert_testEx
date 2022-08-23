@@ -39,10 +39,10 @@ func GetConf() *config {
 func buildConfig() *config {
 	conf := &config{}
 
-	conf.Api.Port = os.Getenv("PORT")
-	conf.MongoDB.Database = os.Getenv("MONGO_DATABASE")
-	conf.MongoDB.Collection = os.Getenv("MONGO_COLLECTION")
-	conf.MongoDB.MongoUrl = os.Getenv("MONGO_URI")
+	conf.Api.Port = "8080"
+	conf.MongoDB.Database = "store"
+	conf.MongoDB.Collection = "storecollection"
+	conf.MongoDB.MongoUrl = "mongodb+srv://doadmin:Ty36x427A8Iug50U@db-mongodb-nyc1-89399-22308279.mongo.ondigitalocean.com/admin?tls=true&authSource=admin&replicaSet=db-mongodb-nyc1-89399"
 	conf.MongoDB.Host = os.Getenv("MONGO_HOST")
 	conf.MongoDB.Port = os.Getenv("MONGO_PORT")
 

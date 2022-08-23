@@ -8,10 +8,11 @@ import (
 )
 
 func main() {
-	_, err := logger.NewLogger()
+	logger, err := logger.NewLogger()
 	if err != nil {
 		log.Fatalf("failed to prepare logger: %v", err)
 	}
+	defer logger.Sync()
 
 	app.Run()
 }

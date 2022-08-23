@@ -17,6 +17,8 @@ var (
 	needToUpdate = true
 )
 
+const waitLimitForTicker = 1 * time.Minute
+
 func GetData(client *mongo.Client) []models.Product {
 	if !needToUpdate {
 		return data
@@ -32,8 +34,12 @@ func GetData(client *mongo.Client) []models.Product {
 	return data
 }
 
+func NeetToUpdate() {
+	needToUpdate = true
+}
+
 func Updater(client *mongo.Client, ctx context.Context, ch chan struct{}) {
-	ticker := time.NewTicker(1 * time.Minute)
+	ticker := time.NewTicker(waitLimitForTicker)
 
 	updateData(client)
 
@@ -63,6 +69,7 @@ func updateData(client *mongo.Client) {
 		zap.S().Errorf("unable to find data: %v", err)
 		return
 	}
+	defer cursor.Close(context.Background())
 
 	for cursor.Next(context.Background()) {
 		var product models.Product

@@ -11,12 +11,12 @@ import (
 	"github.com/mrbelka12000/artforintrovert_testEx/config"
 )
 
-const waitLimit = 8 * time.Second
+const waitLimitForConnection = 8 * time.Second
 
 func GetMongoDBClient() (*mongo.Client, error) {
 	cfg := config.GetConf()
 
-	ctx, _ := context.WithTimeout(context.Background(), waitLimit)
+	ctx, _ := context.WithTimeout(context.Background(), waitLimitForConnection)
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.MongoDB.MongoUrl))
 	if err != nil {
@@ -30,4 +30,3 @@ func GetMongoDBClient() (*mongo.Client, error) {
 
 	return client, err
 }
-

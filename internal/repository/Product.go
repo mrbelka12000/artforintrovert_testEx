@@ -19,15 +19,15 @@ import (
 
 const waitLimit = 8 * time.Second
 
-type manager struct {
+type product struct {
 	client *mongo.Client
 }
 
-func newManager(client *mongo.Client) *manager {
-	return &manager{client}
+func newProduct(client *mongo.Client) *product {
+	return &product{client}
 }
 
-func (m *manager) Delete(id string) error {
+func (m *product) Delete(id string) error {
 	cfg := config.GetConf()
 
 	primitiveId, err := primitive.ObjectIDFromHex(id)
@@ -54,11 +54,11 @@ func (m *manager) Delete(id string) error {
 		return fmt.Errorf("%w", ErrNoDocumentFound)
 	}
 
-	// needToUpdate = true
+	db.NeetToUpdate()
 	return nil
 }
 
-func (m *manager) GetAll() ([]models.Product, error) {
+func (m *product) GetAll() ([]models.Product, error) {
 	tempData := db.GetData(m.client)
 
 	if tempData == nil {
@@ -70,7 +70,7 @@ func (m *manager) GetAll() ([]models.Product, error) {
 }
 
 // Insert inserts default values to database.
-func (m *manager) Insert() error {
+func (m *product) Insert() error {
 	cfg := config.GetConf()
 
 	coll := m.client.Database(cfg.MongoDB.Database).Collection(cfg.MongoDB.Collection)
@@ -97,7 +97,7 @@ func (m *manager) Insert() error {
 	return nil
 }
 
-func (m *manager) Update(product *models.Product) error {
+func (m *product) Update(product *models.Product) error {
 	cfg := config.GetConf()
 
 	coll := m.client.Database(cfg.MongoDB.Database).Collection(cfg.MongoDB.Collection)
@@ -119,6 +119,6 @@ func (m *manager) Update(product *models.Product) error {
 		return fmt.Errorf("%w", ErrNoDocumentFound)
 	}
 
-	// needToUpdate = true
+	db.NeetToUpdate()
 	return nil
 }
