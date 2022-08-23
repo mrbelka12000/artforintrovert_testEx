@@ -17,6 +17,11 @@ services:
     build: .
     environment:
       - cfgPath=config/config.json
+      - PORT=8080
+      - MONGO_DATABASE=store
+      - MONGO_COLLECTION=storecollection
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
     ports:
       - "8080:8080"
     restart: on-failure

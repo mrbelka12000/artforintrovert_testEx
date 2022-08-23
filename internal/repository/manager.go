@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -12,8 +13,11 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/mrbelka12000/artforintrovert_testEx/config"
+	"github.com/mrbelka12000/artforintrovert_testEx/db"
 	"github.com/mrbelka12000/artforintrovert_testEx/models"
 )
+
+const waitLimit = 8 * time.Second
 
 type manager struct {
 	client *mongo.Client
@@ -21,43 +25,6 @@ type manager struct {
 
 func newManager(client *mongo.Client) *manager {
 	return &manager{client}
-}
-
-func (m *manager) GetAll() ([]models.Product, error) {
-	tempData := GetData(m.client)
-
-	if data == nil {
-		zap.S().Error("failed to get data")
-		return nil, fmt.Errorf("failed to get data: %w", ErrNoData)
-	}
-
-	return tempData, nil
-}
-
-func (m *manager) Update(product *models.Product) error {
-	cfg := config.GetConf()
-
-	coll := m.client.Database(cfg.MongoDB.Database).Collection(cfg.MongoDB.Collection)
-
-	ctx, _ := context.WithTimeout(context.Background(), waitLimit)
-
-	update := bson.D{{"$set", bson.D{{"name", product.Name}, {"price", product.Price}}}}
-	result, err := coll.UpdateOne(ctx, bson.M{"_id": product.ID}, update)
-	if err != nil {
-		zap.S().Errorf("failed to delete: %v", err)
-		if errors.Is(err, context.DeadlineExceeded) {
-			return fmt.Errorf("failed to delete: %w", ErrContextTimeout)
-		}
-		return fmt.Errorf("%v: %w", err.Error(), ErrUnknownError)
-	}
-
-	if result.ModifiedCount != 1 {
-		zap.S().Errorf("document with id %v does not exists", product.ID.String())
-		return fmt.Errorf("%w", ErrNoDocumentFound)
-	}
-
-	needToUpdate = true
-	return nil
 }
 
 func (m *manager) Delete(id string) error {
@@ -87,8 +54,19 @@ func (m *manager) Delete(id string) error {
 		return fmt.Errorf("%w", ErrNoDocumentFound)
 	}
 
-	needToUpdate = true
+	// needToUpdate = true
 	return nil
+}
+
+func (m *manager) GetAll() ([]models.Product, error) {
+	tempData := db.GetData(m.client)
+
+	if tempData == nil {
+		zap.S().Error("failed to get data")
+		return nil, fmt.Errorf("failed to get data: %w", ErrNoData)
+	}
+
+	return tempData, nil
 }
 
 // Insert inserts default values to database.
@@ -116,5 +94,31 @@ func (m *manager) Insert() error {
 	for _, v := range products {
 		log.Println(coll.InsertOne(context.TODO(), v))
 	}
+	return nil
+}
+
+func (m *manager) Update(product *models.Product) error {
+	cfg := config.GetConf()
+
+	coll := m.client.Database(cfg.MongoDB.Database).Collection(cfg.MongoDB.Collection)
+
+	ctx, _ := context.WithTimeout(context.Background(), waitLimit)
+
+	update := bson.D{{"$set", bson.D{{"name", product.Name}, {"price", product.Price}}}}
+	result, err := coll.UpdateOne(ctx, bson.M{"_id": product.ID}, update)
+	if err != nil {
+		zap.S().Errorf("failed to delete: %v", err)
+		if errors.Is(err, context.DeadlineExceeded) {
+			return fmt.Errorf("failed to delete: %w", ErrContextTimeout)
+		}
+		return fmt.Errorf("%v: %w", err.Error(), ErrUnknownError)
+	}
+
+	if result.ModifiedCount != 1 {
+		zap.S().Errorf("document with id %v does not exists", product.ID.String())
+		return fmt.Errorf("%w", ErrNoDocumentFound)
+	}
+
+	// needToUpdate = true
 	return nil
 }

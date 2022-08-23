@@ -1,21 +1,19 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"sync"
 
 	"go.uber.org/zap"
-
-	"github.com/tkanos/gonfig"
 )
-
-const cfgPath = "config/config.json"
 
 type config struct {
 	Api struct {
 		Port string
 	}
 	MongoDB struct {
+		MongoUrl   string
 		Database   string
 		Collection string
 		Host       string
@@ -30,7 +28,7 @@ var (
 
 func GetConf() *config {
 	once.Do(func() {
-		cfg = parseConf()
+		cfg = buildConfig()
 		if cfg == nil {
 			return
 		}
@@ -38,17 +36,40 @@ func GetConf() *config {
 	return cfg
 }
 
-func parseConf() *config {
-	path := os.Getenv("cfgPath")
-	if path == "" {
-		path = cfgPath
-	}
-	cfg = &config{}
+func buildConfig() *config {
+	conf := &config{}
 
-	err := gonfig.GetConf(path, cfg)
-	if err != nil {
-		zap.S().Debugf("parse config error: %v ", err.Error())
+	conf.Api.Port = os.Getenv("PORT")
+	conf.MongoDB.Database = os.Getenv("MONGO_DATABASE")
+	conf.MongoDB.Collection = os.Getenv("MONGO_COLLECTION")
+	conf.MongoDB.MongoUrl = os.Getenv("MONGO_URI")
+	conf.MongoDB.Host = os.Getenv("MONGO_HOST")
+	conf.MongoDB.Port = os.Getenv("MONGO_PORT")
+
+	if conf.Api.Port == "" {
+		zap.S().Error("no port in env")
 		return nil
 	}
-	return cfg
+	if conf.MongoDB.Database == "" {
+		zap.S().Error("no mongo database in env")
+		return nil
+	}
+	if conf.MongoDB.Collection == "" {
+		zap.S().Error("no mongo collection in env")
+		return nil
+	}
+	if conf.MongoDB.MongoUrl == "" {
+		conf.MongoDB.MongoUrl = getConnectionToMongoString(conf)
+		if conf.MongoDB.MongoUrl == "" {
+			zap.S().Error("no mongo connection data in env")
+			return nil
+		}
+	}
+
+	return conf
+}
+
+func getConnectionToMongoString(conf *config) (connStr string) {
+	connStr = fmt.Sprintf("mongodb://%v:%v", conf.MongoDB.Host, conf.MongoDB.Port)
+	return
 }

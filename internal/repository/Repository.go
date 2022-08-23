@@ -6,15 +6,8 @@ import (
 	"github.com/mrbelka12000/artforintrovert_testEx/models"
 )
 
-type Store interface {
-	Update(product *models.Product) error
-	GetAll() ([]models.Product, error)
-	Delete(id string) error
-	Insert() error
-}
-
 type Repository struct {
-	Store
+	models.Store
 }
 
 func NewRepository(client *mongo.Client) *Repository {

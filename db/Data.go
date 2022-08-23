@@ -1,4 +1,4 @@
-package repository
+package db
 
 import (
 	"context"
@@ -16,6 +16,40 @@ var (
 	data         []models.Product
 	needToUpdate = true
 )
+
+func GetData(client *mongo.Client) []models.Product {
+	if !needToUpdate {
+		return data
+	}
+
+	updateData(client)
+
+	if needToUpdate {
+		zap.S().Warn("data can not be updated")
+		return nil
+	}
+
+	return data
+}
+
+func Updater(client *mongo.Client, ctx context.Context, ch chan struct{}) {
+	ticker := time.NewTicker(1 * time.Minute)
+
+	updateData(client)
+
+	for {
+		select {
+		case <-ticker.C:
+			if needToUpdate {
+				updateData(client)
+			}
+		case <-ctx.Done():
+			zap.S().Info("updater func successfully ended")
+			ch <- struct{}{}
+			return
+		}
+	}
+}
 
 func updateData(client *mongo.Client) {
 	cfg := config.GetConf()
@@ -51,38 +85,4 @@ func updateData(client *mongo.Client) {
 	data = products
 
 	needToUpdate = false
-}
-
-func GetData(client *mongo.Client) []models.Product {
-	if !needToUpdate {
-		return data
-	}
-
-	updateData(client)
-
-	if needToUpdate {
-		zap.S().Warn("data can not be updated")
-		return nil
-	}
-
-	return data
-}
-
-func Updater(client *mongo.Client, ctx context.Context, ch chan struct{}) {
-	ticker := time.NewTicker(1 * time.Minute)
-
-	updateData(client)
-
-	for {
-		select {
-		case <-ticker.C:
-			if needToUpdate {
-				updateData(client)
-			}
-		case <-ctx.Done():
-			zap.S().Info("updater func successfully ended")
-			ch <- struct{}{}
-			return
-		}
-	}
 }

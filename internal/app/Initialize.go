@@ -11,16 +11,24 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/mrbelka12000/artforintrovert_testEx/config"
+	"github.com/mrbelka12000/artforintrovert_testEx/db"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/handler"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/repository"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/router"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/server"
-	"github.com/mrbelka12000/artforintrovert_testEx/internal/service"
+	"github.com/mrbelka12000/artforintrovert_testEx/pkg/service"
 	"github.com/mrbelka12000/artforintrovert_testEx/pkg/tools"
 )
 
 func Run() {
-	client, err := repository.GetMongoDBClient()
+	cfg := config.GetConf()
+	if cfg == nil {
+		zap.S().Debug("failed to prepare config")
+		return
+	}
+
+	client, err := db.GetMongoDBClient()
 	if err != nil {
 		zap.S().Debugf("failed to get connection: %v", err)
 		return
@@ -38,7 +46,7 @@ func Run() {
 	server := server.NewServer(mux)
 	// srv.Insert()
 
-	go repository.Updater(client, runCtx, wait)
+	go db.Updater(client, runCtx, wait)
 	go func() {
 		err := server.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
