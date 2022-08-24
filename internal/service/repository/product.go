@@ -14,7 +14,7 @@ import (
 
 	"github.com/mrbelka12000/artforintrovert_testEx/config"
 	"github.com/mrbelka12000/artforintrovert_testEx/models"
-	"github.com/mrbelka12000/artforintrovert_testEx/pkg/mongodb"
+	"github.com/mrbelka12000/artforintrovert_testEx/pkg/cache"
 )
 
 const waitLimit = 8 * time.Second
@@ -54,12 +54,12 @@ func (m *product) Delete(id string) error {
 		return fmt.Errorf("%w", ErrNoDocumentFound)
 	}
 
-	mongodb.NeetToUpdate()
+	cache.NeetToUpdate()
 	return nil
 }
 
 func (m *product) GetAll() ([]models.Product, error) {
-	tempData := mongodb.GetData(m.client)
+	tempData := cache.GetData(m.client)
 
 	if tempData == nil {
 		zap.S().Error("failed to get data")
@@ -119,6 +119,6 @@ func (m *product) Update(product *models.Product) error {
 		return fmt.Errorf("%w", ErrNoDocumentFound)
 	}
 
-	mongodb.NeetToUpdate()
+	cache.NeetToUpdate()
 	return nil
 }

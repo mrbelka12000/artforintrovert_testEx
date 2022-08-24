@@ -14,6 +14,7 @@ import (
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/handler"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/service"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/service/repository"
+	"github.com/mrbelka12000/artforintrovert_testEx/pkg/cache"
 	"github.com/mrbelka12000/artforintrovert_testEx/pkg/mongodb"
 	"github.com/mrbelka12000/artforintrovert_testEx/pkg/server"
 )
@@ -46,7 +47,7 @@ func Run(ctx context.Context) {
 
 	srv.Product.Insert()
 
-	go mongodb.Updater(client, runCtx, wait)
+	go cache.Updater(client, runCtx, wait)
 
 	zap.S().Infof("Server started on port: %v", cfg.Api.Port)
 

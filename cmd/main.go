@@ -17,6 +17,7 @@ func main() {
 
 	ctx := context.Background()
 	app.Run(ctx)
+
 	err = ctx.Err()
 	if err != nil {
 		logger.Errorf("context error: %v", err)
