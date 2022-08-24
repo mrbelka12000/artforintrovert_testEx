@@ -15,7 +15,7 @@ import (
 func (h *Handler) GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	data, err := h.srv.Product.GetAll()
+	data, err := h.product.GetAllProducts()
 	if err != nil {
 		zap.S().Errorf("failed to get all products: %v", err)
 		WriteResponse(w, http.StatusInternalServerError, "no data")
@@ -25,7 +25,7 @@ func (h *Handler) GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(tools.GetJsonString(data)))
 }
 
-func (h *Handler) RemoveProduct(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	id, ok := vars["id"]
@@ -35,7 +35,7 @@ func (h *Handler) RemoveProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.srv.Product.Delete(id)
+	err := h.product.DeleteProduct(r.Context(), id)
 	if err != nil {
 		status, msg := service.ParseErrorResponse(err)
 		WriteResponse(w, status, msg)
@@ -62,13 +62,13 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.srv.Product.Update(product)
+	err = h.product.UpdateProduct(r.Context(), product)
 	if err != nil {
 		status, msg := service.ParseErrorResponse(err)
 		WriteResponse(w, status, msg)
 		return
 	}
 
-	zap.S().Infof("document %v successfully deleted", product.ID.String())
+	zap.S().Infof("document %v successfully updated", product.ID.String())
 	WriteResponse(w, http.StatusOK, "updated")
 }

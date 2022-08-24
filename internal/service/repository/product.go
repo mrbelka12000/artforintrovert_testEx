@@ -23,11 +23,11 @@ type product struct {
 	client *mongo.Client
 }
 
-func newProduct(client *mongo.Client) *product {
+func NewProduct(client *mongo.Client) *product {
 	return &product{client}
 }
 
-func (m *product) Delete(id string) error {
+func (m *product) Delete(ctx context.Context, id string) error {
 	cfg := config.GetConf()
 
 	primitiveId, err := primitive.ObjectIDFromHex(id)
@@ -36,7 +36,7 @@ func (m *product) Delete(id string) error {
 		return fmt.Errorf("%w", ErrInvalidId)
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), waitLimit)
+	ctx, _ = context.WithTimeout(ctx, waitLimit)
 
 	coll := m.client.Database(cfg.MongoDB.Database).Collection(cfg.MongoDB.Collection)
 
@@ -97,12 +97,12 @@ func (m *product) Insert() error {
 	return nil
 }
 
-func (m *product) Update(product *models.Product) error {
+func (m *product) Update(ctx context.Context, product *models.Product) error {
 	cfg := config.GetConf()
 
 	coll := m.client.Database(cfg.MongoDB.Database).Collection(cfg.MongoDB.Collection)
 
-	ctx, _ := context.WithTimeout(context.Background(), waitLimit)
+	ctx, _ = context.WithTimeout(ctx, waitLimit)
 
 	update := bson.D{{"$set", bson.D{{"name", product.Name}, {"price", product.Price}}}}
 	result, err := coll.UpdateOne(ctx, bson.M{"_id": product.ID}, update)

@@ -13,13 +13,13 @@ import (
 	"github.com/mrbelka12000/artforintrovert_testEx/models"
 )
 
-type Data struct {
+type data struct {
 	data         []models.Product
 	needToUpdate bool
 	sync.Mutex
 }
 
-var globData = &Data{
+var globData = &data{
 	needToUpdate: true,
 }
 

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -9,16 +10,18 @@ import (
 	"github.com/mrbelka12000/artforintrovert_testEx/models"
 )
 
-type product struct {
-	repo ProductStore
+type Product struct {
+	product ProductStoreRepo
 }
 
-func newProduct(repo ProductStore) *product {
-	return &product{repo}
+func NewProduct(product ProductStoreRepo) *Product {
+	return &Product{
+		product: product,
+	}
 }
 
-func (m *product) Delete(id string) error {
-	err := m.repo.Delete(id)
+func (p *Product) DeleteProduct(ctx context.Context, id string) error {
+	err := p.product.Delete(ctx, id)
 	if err != nil {
 		if IsClientError(err) {
 			return fmt.Errorf("%w: %v", ErrClientError, err.Error())
@@ -32,16 +35,16 @@ func (m *product) Delete(id string) error {
 	return nil
 }
 
-func (m *product) GetAll() ([]models.Product, error) {
-	return m.repo.GetAll()
+func (p *Product) GetAllProducts() ([]models.Product, error) {
+	return p.product.GetAll()
 }
 
-func (m *product) Insert() error {
-	return m.repo.Insert()
+func (p *Product) InsertProduct() error {
+	return p.product.Insert()
 }
 
-func (m *product) Update(product *models.Product) error {
-	err := m.repo.Update(product)
+func (p *Product) UpdateProduct(ctx context.Context, product *models.Product) error {
+	err := p.product.Update(ctx, product)
 	if err != nil {
 		if IsClientError(err) {
 			return fmt.Errorf("%w: %v", ErrClientError, err.Error())

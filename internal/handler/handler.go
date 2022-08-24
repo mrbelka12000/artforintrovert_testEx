@@ -5,9 +5,9 @@ import (
 )
 
 type Handler struct {
-	srv *service.Service
+	product service.ProductStoreSrv
 }
 
-func NewHandler(srv *service.Service) *Handler {
-	return &Handler{srv: srv}
+func NewHandler(srv service.ProductStoreSrv) *Handler {
+	return &Handler{product: srv}
 }

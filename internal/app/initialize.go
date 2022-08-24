@@ -39,18 +39,15 @@ func Run(ctx context.Context) {
 	wait := make(chan struct{})
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-	repo := repository.NewRepository(client)
+	repo := repository.NewRepo(client)
 	srv := service.NewService(repo)
 	hndl := handler.NewHandler(srv)
 	mux := handler.SetUpMux(hndl)
 	httpServer := server.NewServer(mux)
 
-	srv.Product.Insert()
-
 	go cache.Updater(client, runCtx, wait)
 
 	zap.S().Infof("Server started on port: %v", cfg.Api.Port)
-
 	select {
 	case s := <-done:
 		zap.S().Info("app - Run - signal: " + s.String())
