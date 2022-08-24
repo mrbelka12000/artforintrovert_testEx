@@ -10,10 +10,10 @@ import (
 )
 
 type product struct {
-	repo models.ProductStore
+	repo ProductStore
 }
 
-func newProduct(repo models.ProductStore) *product {
+func newProduct(repo ProductStore) *product {
 	return &product{repo}
 }
 

@@ -26,7 +26,6 @@ func Run(ctx context.Context) {
 		zap.S().Debug("failed to prepare config")
 		return
 	}
-	fmt.Printf("%+v \n", cfg)
 
 	client, err := mongodb.GetMongoDBClient(ctx)
 	if err != nil {
@@ -43,8 +42,8 @@ func Run(ctx context.Context) {
 	srv := service.NewService(repo)
 	hndl := handler.NewHandler(srv)
 	mux := handler.SetUpMux(hndl)
-
 	httpServer := server.NewServer(mux)
+
 	srv.Product.Insert()
 
 	go mongodb.Updater(client, runCtx, wait)
@@ -66,7 +65,7 @@ func Run(ctx context.Context) {
 
 	err = client.Disconnect(stopCtx)
 	if err != nil {
-		zap.S().Warnf("failed to close client: %v", err)
+		zap.S().Errorf("failed to close client: %v", err)
 	}
 
 	err = httpServer.Shutdown()
