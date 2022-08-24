@@ -42,7 +42,7 @@ func (h *Handler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.l.Infof("document %v successfully deleted", id)
-	WriteResponse(w, http.StatusNoContent, "deleted")
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
