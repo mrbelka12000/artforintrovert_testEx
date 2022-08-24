@@ -1,3 +1,4 @@
+// Package server is responsible for all server actions.
 package server
 
 import (

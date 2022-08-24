@@ -1,3 +1,4 @@
+// Package tools contains helper functions.
 package tools
 
 import (

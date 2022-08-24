@@ -1,3 +1,4 @@
+// Package mongodb implements connection to MongoDB.
 package mongodb
 
 import (

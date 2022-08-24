@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/mrbelka12000/artforintrovert_testEx/models"
+	"github.com/mrbelka12000/artforintrovert_testEx/internal/models"
 )
 
 type (

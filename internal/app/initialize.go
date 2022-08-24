@@ -1,20 +1,21 @@
+// Package app generates and builds all parts of the application.
 package app
 
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-
-	"go.uber.org/zap"
 
 	"github.com/mrbelka12000/artforintrovert_testEx/config"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/handler"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/service"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/service/repository"
 	"github.com/mrbelka12000/artforintrovert_testEx/pkg/cache"
+	"github.com/mrbelka12000/artforintrovert_testEx/pkg/logger"
 	"github.com/mrbelka12000/artforintrovert_testEx/pkg/mongodb"
 	"github.com/mrbelka12000/artforintrovert_testEx/pkg/server"
 )
@@ -22,15 +23,21 @@ import (
 const waitLimitForGS = 5 * time.Second
 
 func Run(ctx context.Context) {
+	l, err := logger.NewLogger()
+	if err != nil {
+		log.Printf("failed to create logger: %v \n", err)
+		return
+	}
+
 	cfg, err := config.GetConf()
 	if err != nil {
-		zap.S().Debugf("failed to get config: %v", err)
+		l.Debugf("failed to get config: %v", err)
 		return
 	}
 
 	client, err := mongodb.GetMongoDBClient(ctx)
 	if err != nil {
-		zap.S().Debugf("failed to get connection: %v", err)
+		l.Debugf("failed to get connection: %v", err)
 		return
 	}
 
@@ -39,23 +46,24 @@ func Run(ctx context.Context) {
 	wait := make(chan struct{})
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-	repo := repository.NewRepo(client)
-	srv := service.NewService(repo)
-	hndl := handler.NewHandler(srv)
+	repo := repository.NewRepo(client, l)
+	srv := service.NewService(repo, l)
+	hndl := handler.NewHandler(srv, l)
 	mux := handler.SetUpMux(hndl)
 	httpServer := server.NewServer(mux)
 
+	srv.InsertProduct()
 	go cache.Updater(client, runCtx, wait)
 
-	zap.S().Infof("Server started on port: %v", cfg.Api.Port)
+	l.Infof("Server started on port: %v", cfg.Api.Port)
 	select {
 	case s := <-done:
-		zap.S().Info("app - Run - signal: " + s.String())
+		l.Info("app - Run - signal: " + s.String())
 	case err = <-httpServer.Notify():
-		zap.S().Error(fmt.Errorf("http server notify error: %w", err))
+		l.Error(fmt.Errorf("http server notify error: %w", err).Error())
 	}
 
-	zap.S().Info("Server stopped")
+	l.Info("Server stopped")
 
 	runCancel()
 
@@ -63,12 +71,17 @@ func Run(ctx context.Context) {
 
 	err = client.Disconnect(stopCtx)
 	if err != nil {
-		zap.S().Errorf("failed to close client: %v", err)
+		l.Errorf("failed to close client: %v", err)
 	}
 
 	err = httpServer.Shutdown()
 	if err != nil {
-		zap.S().Errorf("failed to shutdown server: %v", err)
+		l.Errorf("failed to shutdown server: %v", err)
+	}
+
+	err = l.Sync()
+	if err != nil {
+		log.Printf("logger sync error: %v \n", err)
 	}
 
 	<-wait

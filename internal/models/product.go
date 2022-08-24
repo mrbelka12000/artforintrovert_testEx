@@ -1,3 +1,5 @@
+// Package models defines main models/entities for business logic, database and
+// HTTP response objects if suitable
 package models
 
 import (

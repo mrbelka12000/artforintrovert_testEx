@@ -5,10 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"go.uber.org/zap"
 
+	"github.com/mrbelka12000/artforintrovert_testEx/internal/models"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/service"
-	"github.com/mrbelka12000/artforintrovert_testEx/models"
 	"github.com/mrbelka12000/artforintrovert_testEx/pkg/tools"
 )
 
@@ -17,7 +16,7 @@ func (h *Handler) GetAllProducts(w http.ResponseWriter, r *http.Request) {
 
 	data, err := h.product.GetAllProducts()
 	if err != nil {
-		zap.S().Errorf("failed to get all products: %v", err)
+		h.l.Errorf("failed to get all products: %v", err)
 		WriteResponse(w, http.StatusInternalServerError, "no data")
 		return
 	}
@@ -30,7 +29,7 @@ func (h *Handler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	id, ok := vars["id"]
 	if !ok {
-		zap.S().Warn("no id to delete")
+		h.l.Warn("no id to delete")
 		WriteResponse(w, http.StatusBadRequest, "no id to delete")
 		return
 	}
@@ -42,7 +41,7 @@ func (h *Handler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	zap.S().Infof("document %v successfully deleted", id)
+	h.l.Infof("document %v successfully deleted", id)
 	WriteResponse(w, http.StatusNoContent, "deleted")
 }
 
@@ -51,13 +50,13 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&product)
 	if err != nil {
-		zap.S().Errorf("invalid body: %v", err)
+		h.l.Errorf("invalid body: %v", err)
 		WriteResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	err = product.Validate()
 	if err != nil {
-		zap.S().Errorf("invalid product settings: %v", err)
+		h.l.Errorf("invalid product settings: %v", err)
 		WriteResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -69,6 +68,6 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	zap.S().Infof("document %v successfully updated", product.ID.String())
+	h.l.Infof("document %v successfully updated", product.ID.String())
 	WriteResponse(w, http.StatusOK, "updated")
 }

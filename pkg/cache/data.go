@@ -1,16 +1,17 @@
+// Package cache save and pdates the data as needed with data from database when server starting.
 package cache
 
 import (
 	"context"
+	"log"
 	"sync"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.uber.org/zap"
 
 	"github.com/mrbelka12000/artforintrovert_testEx/config"
-	"github.com/mrbelka12000/artforintrovert_testEx/models"
+	"github.com/mrbelka12000/artforintrovert_testEx/internal/models"
 )
 
 type data struct {
@@ -34,7 +35,7 @@ func GetData(client *mongo.Client) []models.Product {
 	updateData(client)
 
 	if globData.needToUpdate {
-		zap.S().Warn("data can not be updated")
+		log.Println("error: data can not be updated")
 		return nil
 	}
 
@@ -63,7 +64,7 @@ func Updater(client *mongo.Client, ctx context.Context, ch chan struct{}) {
 			}
 			globData.Unlock()
 		case <-ctx.Done():
-			zap.S().Info("updater func successfully ended")
+			log.Println("updater func successfully ended")
 			ch <- struct{}{}
 			return
 		}
@@ -79,7 +80,7 @@ func updateData(client *mongo.Client) {
 
 	cursor, err := coll.Find(context.Background(), bson.D{})
 	if err != nil {
-		zap.S().Errorf("unable to find data: %v", err)
+		log.Printf("unable to find data: %v \n", err)
 		return
 	}
 	defer cursor.Close(context.Background())
@@ -88,7 +89,7 @@ func updateData(client *mongo.Client) {
 		var product models.Product
 		err := cursor.Decode(&product)
 		if err != nil {
-			zap.S().Debugf("decode error: %v", err)
+			log.Printf("decode error: %v \n", err)
 			continue
 		}
 
@@ -97,11 +98,11 @@ func updateData(client *mongo.Client) {
 
 	err = cursor.Err()
 	if err != nil {
-		zap.S().Debugf("cursor error: %v", err)
+		log.Printf("cursor error: %v \n", err)
 		return
 	}
 
-	zap.S().Info("data successfully updated")
+	log.Println("data successfully updated")
 
 	globData.data = products
 	globData.needToUpdate = false
