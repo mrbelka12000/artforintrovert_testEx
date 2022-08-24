@@ -10,7 +10,7 @@ import (
 
 type config struct {
 	Api struct {
-		Port string `env:"PORT",default:"8080"`
+		Port string `env:"PORT,default=8080"`
 	}
 	MongoDB struct {
 		MongoUrl   string `env:"MONGO_URI,required"`
