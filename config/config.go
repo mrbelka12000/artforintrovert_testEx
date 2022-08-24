@@ -2,10 +2,10 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/sethvargo/go-envconfig"
-	"go.uber.org/zap"
 )
 
 type config struct {
@@ -24,23 +24,24 @@ var (
 	once sync.Once
 )
 
-func GetConf() *config {
+func GetConf() (conf *config, err error) {
 	once.Do(func() {
-		cfg = buildConfig()
-		if cfg == nil {
+		conf, err = buildConfig()
+		if conf == nil {
 			return
 		}
+		cfg = conf
 	})
-	return cfg
+
+	return cfg, err
 }
 
-func buildConfig() *config {
+func buildConfig() (*config, error) {
 	conf := config{}
 	err := envconfig.Process(context.Background(), &conf)
 	if err != nil {
-		zap.S().Errorf("failed to build config: %v", err)
-		return nil
+		return nil, fmt.Errorf("failed to build config: %w", err)
 	}
 
-	return &conf
+	return &conf, nil
 }

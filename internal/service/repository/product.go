@@ -28,7 +28,7 @@ func NewProduct(client *mongo.Client) *product {
 }
 
 func (m *product) Delete(ctx context.Context, id string) error {
-	cfg := config.GetConf()
+	cfg, _ := config.GetConf()
 
 	primitiveId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -71,7 +71,7 @@ func (m *product) GetAll() ([]models.Product, error) {
 
 // Insert inserts default values to database.
 func (m *product) Insert() error {
-	cfg := config.GetConf()
+	cfg, _ := config.GetConf()
 
 	coll := m.client.Database(cfg.MongoDB.Database).Collection(cfg.MongoDB.Collection)
 	products := []models.Product{
@@ -98,7 +98,7 @@ func (m *product) Insert() error {
 }
 
 func (m *product) Update(ctx context.Context, product *models.Product) error {
-	cfg := config.GetConf()
+	cfg, _ := config.GetConf()
 
 	coll := m.client.Database(cfg.MongoDB.Database).Collection(cfg.MongoDB.Collection)
 

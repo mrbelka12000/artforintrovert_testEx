@@ -22,7 +22,7 @@ const (
 )
 
 func NewServer(r *mux.Router) *Server {
-	cfg := config.GetConf()
+	cfg, _ := config.GetConf()
 
 	httpSever := &http.Server{
 		Addr:         ":" + cfg.Api.Port,

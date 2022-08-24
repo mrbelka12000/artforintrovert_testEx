@@ -71,7 +71,7 @@ func Updater(client *mongo.Client, ctx context.Context, ch chan struct{}) {
 }
 
 func updateData(client *mongo.Client) {
-	cfg := config.GetConf()
+	cfg, _ := config.GetConf()
 
 	coll := client.Database(cfg.MongoDB.Database).Collection(cfg.MongoDB.Collection)
 

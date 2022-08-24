@@ -22,9 +22,9 @@ import (
 const waitLimitForGS = 5 * time.Second
 
 func Run(ctx context.Context) {
-	cfg := config.GetConf()
-	if cfg == nil {
-		zap.S().Debug("failed to prepare config")
+	cfg, err := config.GetConf()
+	if err != nil {
+		zap.S().Debugf("failed to get config: %v", err)
 		return
 	}
 

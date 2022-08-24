@@ -14,7 +14,7 @@ import (
 const waitLimitForConnection = 8 * time.Second
 
 func GetMongoDBClient(ctx context.Context) (*mongo.Client, error) {
-	cfg := config.GetConf()
+	cfg, _ := config.GetConf()
 
 	connCtx, _ := context.WithTimeout(ctx, waitLimitForConnection)
 
