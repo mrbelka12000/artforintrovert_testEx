@@ -1,23 +1,21 @@
 package config
 
 import (
-	"fmt"
-	"os"
+	"context"
 	"sync"
 
+	"github.com/sethvargo/go-envconfig"
 	"go.uber.org/zap"
 )
 
 type config struct {
 	Api struct {
-		Port string
+		Port string `env:"PORT",default:"8080"`
 	}
 	MongoDB struct {
-		MongoUrl   string
-		Database   string
-		Collection string
-		Host       string
-		Port       string
+		MongoUrl   string `env:"MONGO_URI,required"`
+		Database   string `env:"MONGO_DATABASE,required"`
+		Collection string `env:"MONGO_COLLECTION,required"`
 	}
 }
 
@@ -37,39 +35,12 @@ func GetConf() *config {
 }
 
 func buildConfig() *config {
-	conf := &config{}
-
-	conf.Api.Port = os.Getenv("PORT")
-	conf.MongoDB.Database = os.Getenv("MONGO_DATABASE")
-	conf.MongoDB.Collection = os.Getenv("MONGO_COLLECTION")
-	conf.MongoDB.MongoUrl = os.Getenv("MONGO_URI")
-	conf.MongoDB.Host = os.Getenv("MONGO_HOST")
-	conf.MongoDB.Port = os.Getenv("MONGO_PORT")
-
-	if conf.Api.Port == "" {
-		zap.S().Error("no port in env")
+	conf := config{}
+	err := envconfig.Process(context.Background(), &conf)
+	if err != nil {
+		zap.S().Errorf("failed to build config: %v", err)
 		return nil
 	}
-	if conf.MongoDB.Database == "" {
-		zap.S().Error("no mongo database in env")
-		return nil
-	}
-	if conf.MongoDB.Collection == "" {
-		zap.S().Error("no mongo collection in env")
-		return nil
-	}
-	if conf.MongoDB.MongoUrl == "" {
-		conf.MongoDB.MongoUrl = getConnectionToMongoString(conf)
-		if conf.MongoDB.MongoUrl == "" {
-			zap.S().Error("no mongo connection data in env")
-			return nil
-		}
-	}
 
-	return conf
-}
-
-func getConnectionToMongoString(conf *config) (connStr string) {
-	connStr = fmt.Sprintf("mongodb://%v:%v", conf.MongoDB.Host, conf.MongoDB.Port)
-	return
+	return &conf
 }

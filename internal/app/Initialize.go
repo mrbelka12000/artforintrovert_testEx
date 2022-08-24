@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,7 +16,6 @@ import (
 	"github.com/mrbelka12000/artforintrovert_testEx/db"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/handler"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/repository"
-	"github.com/mrbelka12000/artforintrovert_testEx/internal/router"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/server"
 	"github.com/mrbelka12000/artforintrovert_testEx/pkg/service"
 )
@@ -28,6 +28,7 @@ func Run(ctx context.Context) {
 		zap.S().Debug("failed to prepare config")
 		return
 	}
+	fmt.Printf("%+v \n", cfg)
 
 	client, err := db.GetMongoDBClient(ctx)
 	if err != nil {
@@ -42,10 +43,10 @@ func Run(ctx context.Context) {
 
 	repo := repository.NewRepository(client)
 	srv := service.NewService(repo)
-	handler := handler.NewHandler(srv)
-	mux := router.SetUpMux(handler)
+	hndl := handler.NewHandler(srv)
+	mux := handler.SetUpMux(hndl)
 	server := server.NewServer(mux)
-	srv.Insert()
+	srv.Product.Insert()
 
 	go db.Updater(client, runCtx, wait)
 	go func() {

@@ -6,15 +6,14 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/mrbelka12000/artforintrovert_testEx/internal/repository"
 	"github.com/mrbelka12000/artforintrovert_testEx/models"
 )
 
 type product struct {
-	repo *repository.Repository
+	repo models.Store
 }
 
-func newProduct(repo *repository.Repository) *product {
+func newProduct(repo models.Store) *product {
 	return &product{repo}
 }
 

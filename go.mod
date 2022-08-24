@@ -3,6 +3,7 @@ module github.com/mrbelka12000/artforintrovert_testEx
 go 1.17
 
 require (
+	github.com/caarlos0/env v3.5.0+incompatible // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
@@ -10,6 +11,7 @@ require (
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/sethvargo/go-envconfig v0.8.2 // indirect
 	github.com/tkanos/gonfig v0.0.0-20210106201359-53e13348de2f // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.1 // indirect

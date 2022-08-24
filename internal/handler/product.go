@@ -15,7 +15,7 @@ import (
 func (h *Handler) GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	data, err := h.srv.GetAll()
+	data, err := h.srv.Product.GetAll()
 	if err != nil {
 		zap.S().Errorf("failed to get all products: %v", err)
 		WriteResponse(w, http.StatusInternalServerError, "no data")
@@ -35,7 +35,7 @@ func (h *Handler) RemoveProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.srv.Delete(id)
+	err := h.srv.Product.Delete(id)
 	if err != nil {
 		status, msg := service.ParseErrorResponse(err)
 		WriteResponse(w, status, msg)
@@ -62,7 +62,7 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.srv.Update(product)
+	err = h.srv.Product.Update(product)
 	if err != nil {
 		status, msg := service.ParseErrorResponse(err)
 		WriteResponse(w, status, msg)
