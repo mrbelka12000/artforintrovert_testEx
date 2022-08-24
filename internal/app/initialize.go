@@ -52,7 +52,9 @@ func Run(ctx context.Context) {
 	mux := handler.SetUpMux(hndl)
 	httpServer := server.NewServer(mux)
 
-	srv.InsertProduct()
+	//to manually fill in the database
+	//srv.InsertProduct()
+
 	go cache.Updater(client, runCtx, wait)
 
 	l.Infof("Server started on port: %v", cfg.Api.Port)
