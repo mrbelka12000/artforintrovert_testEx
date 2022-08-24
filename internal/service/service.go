@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/mrbelka12000/artforintrovert_testEx/internal/repository"
+	"github.com/mrbelka12000/artforintrovert_testEx/internal/service/repository"
 )
 
 type Service struct {

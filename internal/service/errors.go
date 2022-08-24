@@ -6,7 +6,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/mrbelka12000/artforintrovert_testEx/internal/repository"
+	"github.com/mrbelka12000/artforintrovert_testEx/internal/service/repository"
 )
 
 var (

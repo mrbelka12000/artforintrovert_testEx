@@ -7,8 +7,8 @@ import (
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 
+	"github.com/mrbelka12000/artforintrovert_testEx/internal/service"
 	"github.com/mrbelka12000/artforintrovert_testEx/models"
-	"github.com/mrbelka12000/artforintrovert_testEx/pkg/service"
 	"github.com/mrbelka12000/artforintrovert_testEx/pkg/tools"
 )
 
@@ -69,5 +69,6 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	zap.S().Infof("document %v successfully deleted", product.ID.String())
 	WriteResponse(w, http.StatusOK, "updated")
 }

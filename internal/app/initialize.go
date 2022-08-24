@@ -2,9 +2,7 @@ package app
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,11 +11,11 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/mrbelka12000/artforintrovert_testEx/config"
-	"github.com/mrbelka12000/artforintrovert_testEx/db"
 	"github.com/mrbelka12000/artforintrovert_testEx/internal/handler"
-	"github.com/mrbelka12000/artforintrovert_testEx/internal/repository"
-	"github.com/mrbelka12000/artforintrovert_testEx/internal/server"
-	"github.com/mrbelka12000/artforintrovert_testEx/pkg/service"
+	"github.com/mrbelka12000/artforintrovert_testEx/internal/service"
+	"github.com/mrbelka12000/artforintrovert_testEx/internal/service/repository"
+	"github.com/mrbelka12000/artforintrovert_testEx/pkg/mongodb"
+	"github.com/mrbelka12000/artforintrovert_testEx/pkg/server"
 )
 
 const waitLimitForGS = 5 * time.Second
@@ -30,7 +28,7 @@ func Run(ctx context.Context) {
 	}
 	fmt.Printf("%+v \n", cfg)
 
-	client, err := db.GetMongoDBClient(ctx)
+	client, err := mongodb.GetMongoDBClient(ctx)
 	if err != nil {
 		zap.S().Debugf("failed to get connection: %v", err)
 		return
@@ -45,41 +43,38 @@ func Run(ctx context.Context) {
 	srv := service.NewService(repo)
 	hndl := handler.NewHandler(srv)
 	mux := handler.SetUpMux(hndl)
-	server := server.NewServer(mux)
+
+	httpServer := server.NewServer(mux)
 	srv.Product.Insert()
 
-	go db.Updater(client, runCtx, wait)
-	go func() {
-		err := server.ListenAndServe()
-		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			zap.S().Errorf("failed to stop server: %v", err)
-			return
-		}
-	}()
+	go mongodb.Updater(client, runCtx, wait)
 
 	zap.S().Infof("Server started on port: %v", cfg.Api.Port)
-	<-done
 
-	stopCtx, _ := context.WithTimeout(ctx, waitLimitForGS)
+	select {
+	case s := <-done:
+		zap.S().Info("app - Run - signal: " + s.String())
+	case err = <-httpServer.Notify():
+		zap.S().Error(fmt.Errorf("http server notify error: %w", err))
+	}
+
 	zap.S().Info("Server stopped")
 
-	defer func() {
-		err = client.Disconnect(stopCtx)
-		if err != nil {
-			zap.S().Warnf("failed to close client: %v", err)
-		} else {
-			zap.S().Info("client successfully closed")
-		}
-		close(done)
-		close(wait)
-	}()
 	runCancel()
 
-	err = server.Shutdown(stopCtx)
+	stopCtx, _ := context.WithTimeout(ctx, waitLimitForGS)
+
+	err = client.Disconnect(stopCtx)
+	if err != nil {
+		zap.S().Warnf("failed to close client: %v", err)
+	}
+
+	err = httpServer.Shutdown()
 	if err != nil {
 		zap.S().Errorf("failed to shutdown server: %v", err)
-		return
 	}
 
 	<-wait
+	close(done)
+	close(wait)
 }

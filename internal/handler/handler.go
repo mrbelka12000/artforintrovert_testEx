@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/mrbelka12000/artforintrovert_testEx/pkg/service"
+	"github.com/mrbelka12000/artforintrovert_testEx/internal/service"
 )
 
 type Handler struct {
