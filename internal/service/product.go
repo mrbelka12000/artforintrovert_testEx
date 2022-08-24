@@ -10,17 +10,17 @@ import (
 	"github.com/mrbelka12000/artforintrovert_testEx/models"
 )
 
-type Product struct {
+type productRepo struct {
 	product ProductStoreRepo
 }
 
-func NewProduct(product ProductStoreRepo) *Product {
-	return &Product{
+func newProduct(product ProductStoreRepo) *productRepo {
+	return &productRepo{
 		product: product,
 	}
 }
 
-func (p *Product) DeleteProduct(ctx context.Context, id string) error {
+func (p *productRepo) DeleteProduct(ctx context.Context, id string) error {
 	err := p.product.Delete(ctx, id)
 	if err != nil {
 		if IsClientError(err) {
@@ -35,15 +35,15 @@ func (p *Product) DeleteProduct(ctx context.Context, id string) error {
 	return nil
 }
 
-func (p *Product) GetAllProducts() ([]models.Product, error) {
+func (p *productRepo) GetAllProducts() ([]models.Product, error) {
 	return p.product.GetAll()
 }
 
-func (p *Product) InsertProduct() error {
+func (p *productRepo) InsertProduct() error {
 	return p.product.Insert()
 }
 
-func (p *Product) UpdateProduct(ctx context.Context, product *models.Product) error {
+func (p *productRepo) UpdateProduct(ctx context.Context, product *models.Product) error {
 	err := p.product.Update(ctx, product)
 	if err != nil {
 		if IsClientError(err) {

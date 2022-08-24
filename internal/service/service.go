@@ -1,11 +1,11 @@
 package service
 
 type Service struct {
-	Product
+	*productRepo
 }
 
 func NewService(repo ProductStoreRepo) *Service {
 	return &Service{
-		Product: *NewProduct(repo),
+		productRepo: newProduct(repo),
 	}
 }

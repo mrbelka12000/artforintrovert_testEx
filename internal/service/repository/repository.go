@@ -8,6 +8,6 @@ type Repository struct {
 
 func NewRepo(client *mongo.Client) *Repository {
 	return &Repository{
-		product: NewProduct(client),
+		product: newProduct(client),
 	}
 }

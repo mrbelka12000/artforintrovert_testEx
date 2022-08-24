@@ -23,7 +23,7 @@ type product struct {
 	client *mongo.Client
 }
 
-func NewProduct(client *mongo.Client) *product {
+func newProduct(client *mongo.Client) *product {
 	return &product{client}
 }
 
