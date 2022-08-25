@@ -28,6 +28,7 @@ func Run(ctx context.Context) {
 		log.Printf("failed to create logger: %v \n", err)
 		return
 	}
+	defer l.Sync()
 
 	cfg, err := config.GetConf()
 	if err != nil {

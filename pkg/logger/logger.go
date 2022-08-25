@@ -39,7 +39,7 @@ func NewLogger() (*Logger, error) {
 
 //Sync clears log buffer
 func (l *Logger) Sync() error {
-	return l.Sync()
+	return l.logger.Sync()
 }
 
 func (l *Logger) Debug(msg string) {
