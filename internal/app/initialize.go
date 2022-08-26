@@ -82,11 +82,6 @@ func Run(ctx context.Context) {
 		l.Errorf("failed to shutdown server: %v", err)
 	}
 
-	err = l.Sync()
-	if err != nil {
-		log.Printf("logger sync error: %v \n", err)
-	}
-
 	<-wait
 	close(done)
 	close(wait)
