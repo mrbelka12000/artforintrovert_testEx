@@ -53,8 +53,8 @@ func Run(ctx context.Context) {
 	mux := handler.SetUpMux(hndl)
 	httpServer := server.NewServer(mux)
 
-	//to manually fill in the database
-	//srv.InsertProduct()
+	// to manually fill in the database
+	// srv.InsertProduct()
 
 	go cache.Updater(client, runCtx, wait)
 
