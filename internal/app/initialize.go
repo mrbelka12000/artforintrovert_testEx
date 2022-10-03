@@ -4,6 +4,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/mrbelka12000/artforintrovert_testEx/pkg/metrics"
 	"log"
 	"os"
 	"os/signal"
@@ -22,6 +23,8 @@ import (
 
 const waitLimitForGS = 5 * time.Second
 
+var beka = make([]string, 20000)
+
 func Run(ctx context.Context) {
 	l, err := logger.NewLogger()
 	if err != nil {
@@ -33,6 +36,12 @@ func Run(ctx context.Context) {
 	cfg, err := config.GetConf()
 	if err != nil {
 		l.Debugf("failed to get config: %v", err)
+		return
+	}
+
+	err = metrics.Register()
+	if err != nil {
+		l.Debugf("failed register metrics: %v", err)
 		return
 	}
 
@@ -54,7 +63,7 @@ func Run(ctx context.Context) {
 	httpServer := server.NewServer(mux)
 
 	// to manually fill in the database
-	// srv.InsertProduct()
+	srv.InsertProduct()
 
 	go cache.Updater(client, runCtx, wait)
 
@@ -81,7 +90,7 @@ func Run(ctx context.Context) {
 	if err != nil {
 		l.Errorf("failed to shutdown server: %v", err)
 	}
-
+	fmt.Println(beka)
 	<-wait
 	close(done)
 	close(wait)
