@@ -23,8 +23,6 @@ import (
 
 const waitLimitForGS = 5 * time.Second
 
-var beka = make([]string, 20000)
-
 func Run(ctx context.Context) {
 	l, err := logger.NewLogger()
 	if err != nil {
@@ -90,7 +88,6 @@ func Run(ctx context.Context) {
 	if err != nil {
 		l.Errorf("failed to shutdown server: %v", err)
 	}
-	fmt.Println(beka)
 	<-wait
 	close(done)
 	close(wait)
